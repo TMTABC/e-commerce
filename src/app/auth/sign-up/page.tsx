@@ -9,7 +9,7 @@ const SignUpSchema = zod.object({
     password: zod.string().min(6),
 })
 
-async function SignUpPage(props) {
+async function SignUpPage() {
     const session = await getCurrentSession();
     if (session.user) {
         return redirect("/");

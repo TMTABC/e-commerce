@@ -4,6 +4,7 @@ import Link from "next/link";
 import {User} from "@/generated/prisma";
 import {logoutUser} from "@/action/auths";
 import {useRouter} from "next/navigation";
+import HeaderSearchBar from "@/components/layout/HeaderSearchBar";
 const AnnouncementBar = () => {
     return (
         <div className={"w-full bg-black py-2"}>
@@ -18,9 +19,10 @@ const AnnouncementBar = () => {
 
 type HeaderProps = {
     user: Omit<User, "passwordHash">|null,
+    categorySelector: React.ReactNode
 }
 
-function Header({user}: HeaderProps) {
+function Header({user,categorySelector}: HeaderProps) {
     const router = useRouter();
      const [ isOpen, setOpen ] = useState<boolean>(true);
      const [prevSrcollY, setPrevSrcollY] = useState<number>(0);
@@ -45,7 +47,7 @@ function Header({user}: HeaderProps) {
         <header className={`w-full sticky top-0 z-50`}>
             <div className={`w-full transform transition-transform duration-300 ease-in-out ${isOpen? "translate-y-0":"-translate-y-full"}`}>
                 <AnnouncementBar/>
-                <div className={`flex items-center justify-between py-3 sm:py4 bg-white/60 shadow-sm border-b border-gray-200 backdrop-blur-sm`}>
+                <div className={`flex items-center justify-between py-3 sm:py-4 bg-white/60 shadow-sm border-b border-gray-200 backdrop-blur-sm`}>
                     <div className={`flex justify-between items-center container mx-auto px-8`}>
                         <div className={"flex flex-1 justify-start items-center gap-6 sm:gap-6"}>
                             <button className={`text-gray-700 hover:text-gray-900 md:hidden`}>
@@ -63,34 +65,21 @@ function Header({user}: HeaderProps) {
                                 </svg>
                             </button>
                             <nav className={`hidden md:flex gap-6 lg:gap-6 text-sm font-medium`}>
-                                <Link href="/">Shop</Link>
-                                <Link href="/">New Arrivals</Link>
+                                {/*<Link href="/">Shop</Link>*/}
+                                {/*<Link href="/">New Arrivals</Link>*/}
+                                {categorySelector}
                                 <Link href="/">Sale</Link>
                             </nav>
                         </div>
                         <Link href={"/"} className={"absolute left-1/2 -translate-x-1/2"}>
                             <span className={`text-xl sm:text-2xl font-bold tracking-tight`}>
-                                Deal
+                                DEAL
                             </span>
                         </Link>
                         <div className={`flex flex-1 justify-end items-center gap-2 sm:gap-4`}>
-                            <button className={`text-gray-700 hover:text-gray-900 hidden sm:block cursor-pointer`}>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    className="h-6 w-6 sm:h-6 sm:w-6"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        strokeLinecap={'round'}
-                                        strokeLinejoin={'round'}
-                                        strokeWidth={2}
-
-                                    />
-                                </svg>
-                            </button>
+                            <div className="ml-2 sm:ml-4 lg:ml-6 xl:ml-8">
+                                <HeaderSearchBar />
+                            </div>
                             {user?(
                                 <div className={"flex items-center gap-2 sm:gap-4"}>
                                         <span className={`text-sm text-gray-700 hidden md:block`}>{user.email}</span>

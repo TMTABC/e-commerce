@@ -11,7 +11,7 @@ const SalesCampaingBanner = () => {
                 <div className={"flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-white"}>
                     <div className={"flex items-center gap-2"}>
                         <span className={"text-xl sm:text-2xl font-bold animate-bounce"}>
-                            WOW
+                            WOW 🔥
                         </span>
                         <div className={"text-sm sm:text-base font-bold "}>
                             FLASH SALE ENDS IN:
@@ -21,7 +21,7 @@ const SalesCampaingBanner = () => {
                         </div>
                         <div className={"flex items-center gap-2"}>
                             <span className={"text-xl font-bold"}>
-                                DAY
+                                ⚡
                             </span>
                             <span className={"font-bold text-yellow-200 animate-pulse"}>
                                 UP TO 95% OFF!!

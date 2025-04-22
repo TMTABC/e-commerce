@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import React from "react";
 import {getCurrentSession} from "@/action/auths";
 import {SanityLive} from "@/sanity/lib/live";
+import HeaderCategorySelector from "@/components/layout/HeaderCategorySelector";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -29,12 +30,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
     const {user} = await getCurrentSession();
+
   return (
     <html lang="en">
       <body
         className={`${inter.className} antialiased bg-white min-h-[125vh]`}
       >
-      <Header user={user}></Header>
+      <Header user={user} categorySelector={<HeaderCategorySelector/>}></Header>
         {children}
       <SanityLive/>
       </body>
