@@ -20,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sanity": "^3.85.1",
+    "stripe": "^18.0.0",
     "styled-components": "^6.1.17",
     "zod": "^3.24.3",
     "zustand": "^5.0.3"

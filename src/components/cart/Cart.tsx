@@ -1,16 +1,18 @@
 "use client"
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useCartStore} from "@/stores/cart-store";
 import {useShallow} from "zustand/shallow";
-import {ShoppingCart, X} from "lucide-react";
+import {Loader2, ShoppingCart, X} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {formatPrice} from "@/lib/utils";
+import {createCheckoutSession} from "@/action/stripe-actions";
 
 const freeShippingAmount = 15;
 const Cart = () => {
-    const {removeItem,items,close,isOpen,syncWithUser,setLoaded,getTotalItems,getTotalPrice,updateQuantity} = useCartStore(
+    const {cartId,removeItem,items,close,isOpen,syncWithUser,setLoaded,getTotalItems,getTotalPrice,updateQuantity} = useCartStore(
         useShallow((state)=>({
+            cartId:state.cartId,
             items:state.items,
             close:state.close,
             isOpen:state.isOpen,
@@ -30,6 +32,16 @@ const Cart = () => {
         }
         initCart();
     }, [])
+    const [loadingProceed, setLoadingProceed] = useState<boolean>(false)
+    const handleProceedToCheckout = async () => {
+        if (!cartId||loadingProceed) {
+            return;
+        }
+        setLoadingProceed(true);
+        const checkoutUrl = await createCheckoutSession(cartId);
+        window.location.href = checkoutUrl;
+        setLoadingProceed(false)
+    }
     const totalPrice = getTotalPrice();
     const remainingForFreeShipping = useMemo(()=>{
         return Math.max(0, freeShippingAmount - totalPrice);
@@ -187,9 +199,17 @@ const Cart = () => {
                                         <span className={"font-bold text-lg"}>{formatPrice(totalPrice)}</span>
                                     </div>
                                     <button
+                                        disabled={loadingProceed}
+                                        onClick={handleProceedToCheckout}
                                         className={"w-full bg-black text-white py-4 rounded-full font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"}
                                     >
-                                        Proceed to Checkout
+                                        {loadingProceed ? (
+                                            <div className={"flex items-center gap-1"}>
+                                                Navigating to checkout...
+                                                <Loader2 className={"w-4 h-4 animate-spin"}/>
+                                            </div>
+                                        ):('Proceed to Checkout')}
+
                                     </button>
                                     <div className={'mt-4 space-y-2'}>
                                         <div className='flex items-center gap-2 text-sm text-gray-500'>
