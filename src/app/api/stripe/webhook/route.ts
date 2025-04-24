@@ -74,7 +74,7 @@ export async function POST(req:Request){
                     }
                 });
                 if (!cart) {
-                    throw new Error("Cart not found.");
+                    throw new Error("Cart not found");
                 }
                 await sanityClient.create({
                     _type: 'order',
