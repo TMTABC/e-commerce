@@ -5,6 +5,8 @@ import {User} from "@/generated/prisma";
 import {logoutUser} from "@/action/auths";
 import {useRouter} from "next/navigation";
 import HeaderSearchBar from "@/components/layout/HeaderSearchBar";
+import {useCartStore} from "@/stores/cart-store";
+import {useShallow} from "zustand/shallow";
 const AnnouncementBar = () => {
     return (
         <div className={"w-full bg-black py-2"}>
@@ -26,6 +28,13 @@ function Header({user,categorySelector}: HeaderProps) {
     const router = useRouter();
      const [ isOpen, setOpen ] = useState<boolean>(true);
      const [prevSrcollY, setPrevSrcollY] = useState<number>(0);
+
+     const {open,getTotalItems} = useCartStore(
+         useShallow((state)=>({
+             open:state.open,
+             getTotalItems:state.getTotalItems,
+         }))
+     )
      useEffect(() => {
          const handleSrcoll = ()=>{
              const currentSrcollY = window.scrollY;
@@ -101,7 +110,10 @@ function Header({user,categorySelector}: HeaderProps) {
                                     <Link href={"/auth/sign-up"} className={`text-gray-700 hover:text-gray-900 text-xs sm:text-sm font-medium tracking-widest`}>Sign Up</Link>
                                 </React.Fragment>
                             )}
-                            <button className={"text-gray-700 hover:text-gray-900 relative cursor-pointer"}>
+                            <button
+                                onClick={() => open()}
+                                className={"text-gray-700 hover:text-gray-900 relative cursor-pointer"}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -118,7 +130,7 @@ function Header({user,categorySelector}: HeaderProps) {
                                 </svg>
 
                                 <span className={`absolute -top-1 -right-1 bg-black text-white text-[10px] sm:text-xs w-3.5 h-3.5 rounded-full flex item-center justify-center`}>
-                                    0
+                                    {getTotalItems()}
                                 </span>
                             </button>
                         </div>
