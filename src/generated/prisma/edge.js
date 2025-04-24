@@ -160,6 +160,10 @@ const config = {
         "fromEnvVar": null,
         "value": "debian-openssl-3.0.x",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -177,16 +181,17 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgres://neondb_owner:npg_nmP70YXVRODF@ep-polished-wildflower-a2ta39e1-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+        "value": null
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id           Int       @id @default(autoincrement())\n  email        String    @unique\n  passwordHash String\n  sessions     Session[]\n  cart         Cart?\n}\n\nmodel Session {\n  id        String   @id\n  userId    Int\n  expiresAt DateTime\n\n  user User @relation(references: [id], fields: [userId], onDelete: Cascade)\n}\n\nmodel CartLineItem {\n  id              String @id\n  sanityProductId String\n  quantity        Int\n\n  title String\n  price Float\n  image String\n\n  cartId String\n  cart   Cart   @relation(references: [id], fields: [cartId], onDelete: Cascade)\n}\n\nmodel Cart {\n  id     String         @id\n  userId Int?           @unique\n  user   User?          @relation(references: [id], fields: [userId], onDelete: Cascade)\n  items  CartLineItem[]\n}\n",
-  "inlineSchemaHash": "49ab192f3b2bad126a417b210e58a25b4bd95b03e7a9adc368846f69a181bcdb",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id           Int       @id @default(autoincrement())\n  email        String    @unique\n  passwordHash String\n  sessions     Session[]\n  cart         Cart?\n}\n\nmodel Session {\n  id        String   @id\n  userId    Int\n  expiresAt DateTime\n\n  user User @relation(references: [id], fields: [userId], onDelete: Cascade)\n}\n\nmodel CartLineItem {\n  id              String @id\n  sanityProductId String\n  quantity        Int\n\n  title String\n  price Float\n  image String\n\n  cartId String\n  cart   Cart   @relation(references: [id], fields: [cartId], onDelete: Cascade)\n}\n\nmodel Cart {\n  id     String         @id\n  userId Int?           @unique\n  user   User?          @relation(references: [id], fields: [userId], onDelete: Cascade)\n  items  CartLineItem[]\n}\n",
+  "inlineSchemaHash": "8c6d7630a08b6e9a7a58385befeb86f283b34d9014e9652b496efb4f68802573",
   "copyEngine": true
 }
 config.dirname = '/'
