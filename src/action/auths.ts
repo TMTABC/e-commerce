@@ -142,6 +142,7 @@ export const registerUser = async (email:string,password:string)=>{
         }
 
     }catch (error) {
+        console.log(error);
         return{
             user:null,
             error:"Failed to register"

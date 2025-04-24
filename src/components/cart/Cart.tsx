@@ -31,7 +31,7 @@ const Cart = () => {
             setLoaded(true);
         }
         initCart();
-    }, [])
+    }, [setLoaded, syncWithUser])
     const [loadingProceed, setLoadingProceed] = useState<boolean>(false)
     const handleProceedToCheckout = async () => {
         if (!cartId||loadingProceed) {

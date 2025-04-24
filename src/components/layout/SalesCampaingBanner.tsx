@@ -29,7 +29,7 @@ const SalesCampaingBanner = () => {
                         </div>
                         <button
                             className={"bg-white text-red-600 px-4 py-1 rounded-full font-bold text-sm hover:bg-yellow-200 transition-colors shadow-lg"}
-                            onClick={(event) => {
+                            onClick={() => {
                                 router.push("/");
                             }}
                         >

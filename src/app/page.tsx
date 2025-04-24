@@ -1,12 +1,9 @@
 import { getCurrentSession } from "@/action/auths";
 import { getAllProducts } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
 import SalesCampaingBanner from "@/components/layout/SalesCampaingBanner";
 import ProductGrid from "@/components/product/ProductGrid";
 
 export default async function Home() {
-    const { user } = await getCurrentSession();
     const products = await getAllProducts();
     // console.log(products);
 
