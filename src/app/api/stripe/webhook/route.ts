@@ -1,6 +1,5 @@
 import Stripe from "stripe";
 import {createClient} from "next-sanity";
-import {apiVersion, dataset, projectId} from "@/sanity/env";
 import {headers} from "next/headers";
 import {NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
@@ -48,11 +47,23 @@ export async function POST(req:Request){
 
         switch (event.type) {
             case 'checkout.session.completed':{
-                const session = event.data.object as Stripe.Checkout.Session;
+                const session = event.data.object as Stripe.Checkout.Session & {
+                    shipping_details?: {
+                        name?: string;
+                        address?: {
+                            line1?: string;
+                            line2?: string;
+                            city?: string;
+                            state?: string;
+                            postal_code?: string;
+                            country?: string;
+                        };
+                    };
+                };
                 const cartId = session.metadata?.cartId;
                 const userId = session.metadata?.userId;
                 if (!cartId) {
-                    throw new Error("No cart ID in session metad");
+                    throw new Error("No cart ID in session metadata");
                 }
                 const cart = await prisma.cart.findUnique({
                     where:{
