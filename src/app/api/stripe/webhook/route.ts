@@ -47,20 +47,10 @@ export async function POST(req:Request){
 
         switch (event.type) {
             case 'checkout.session.completed':{
-                const session = event.data.object as Stripe.Checkout.Session & {
-                    shipping_details?: {
-                        name?: string;
-                        address?: {
-                            line1?: string;
-                            line2?: string;
-                            city?: string;
-                            state?: string;
-                            postal_code?: string;
-                            country?: string;
-                        };
-                    };
-                };
+                const session = event.data.object as Stripe.Checkout.Session;
+
                 console.log("✅ Stripe session received:", JSON.stringify(session, null, 2));
+                console.log("aklsdalsdmalsd: , session.id.slice(-8).toUpperCase(),", session.id.slice(-8).toUpperCase())
                 const cartId = session.metadata?.cartId;
                 const userId = session.metadata?.userId;
                 if (!cartId) {
@@ -90,13 +80,13 @@ export async function POST(req:Request){
                     totalPrice: Number(session.amount_total)/100,
                     shippingAddress: {
                         _type: "shippingAddress",
-                        name:session.shipping_details?.name,
-                        line1:session.shipping_details?.address?.line1,
-                        line2:session.shipping_details?.address?.line2,
-                        city:session.shipping_details?.address?.city,
-                        state:session.shipping_details?.address?.state,
-                        postalCode:session.shipping_details?.address?.postal_code,
-                        country:session.shipping_details?.address?.country,
+                        name: session.customer_details?.name,
+                        line1: session.customer_details?.address?.line1,
+                        line2: session.customer_details?.address?.line2,
+                        city: session.customer_details?.address?.city,
+                        state: session.customer_details?.address?.state,
+                        postalCode: session.customer_details?.address?.postal_code,
+                        country: session.customer_details?.address?.country,
                     },
                     orderItems: cart.items.map((item) => ({
                         _type:'orderItem',
