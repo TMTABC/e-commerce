@@ -74,7 +74,7 @@ export type Order = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  orderNumber?: number;
+  orderNumber?: string;
   orderDate?: string;
   customerId?: string;
   customerName?: string;

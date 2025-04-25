@@ -50,7 +50,6 @@ export async function POST(req:Request){
                 const session = event.data.object as Stripe.Checkout.Session;
 
                 console.log("✅ Stripe session received:", JSON.stringify(session, null, 2));
-                console.log("aklsdalsdmalsd: , session.id.slice(-8).toUpperCase(),", session.id.slice(-8).toUpperCase())
                 const cartId = session.metadata?.cartId;
                 const userId = session.metadata?.userId;
                 if (!cartId) {

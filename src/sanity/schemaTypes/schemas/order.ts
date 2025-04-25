@@ -74,7 +74,7 @@ export const order = defineType({
         defineField({
             name:"orderNumber",
             title:"Order Number",
-            type:"number",
+            type:"string",
         }),
         defineField({
             name:"orderDate",
