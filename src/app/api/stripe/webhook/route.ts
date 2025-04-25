@@ -60,6 +60,7 @@ export async function POST(req:Request){
                         };
                     };
                 };
+                console.log("✅ Stripe session received:", JSON.stringify(session, null, 2));
                 const cartId = session.metadata?.cartId;
                 const userId = session.metadata?.userId;
                 if (!cartId) {
