@@ -3,6 +3,7 @@ import {createClient} from "next-sanity";
 import {headers} from "next/headers";
 import {NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
+import {umamiTrackCheckoutSuccessEvent} from "@/lib/umami";
 
 export async function POST(req:Request){
 
@@ -66,7 +67,7 @@ export async function POST(req:Request){
                 if (!cart) {
                     throw new Error("Cart not found");
                 }
-                await sanityClient.create({
+                const order = await sanityClient.create({
                     _type: 'order',
                     orderNumber: session.id.slice(-8).toUpperCase(),
                     orderDate: new Date().toISOString(),
@@ -99,6 +100,18 @@ export async function POST(req:Request){
                     })),
                     status:'PROCESSING'
                 })
+                try {
+                    await umamiTrackCheckoutSuccessEvent({
+                        cartId: cartId,
+                        email: order.customerEmail || '-',
+                        orderId: order.orderNumber,
+                        orderTotal: order.totalPrice,
+                        orderCurrency: "USD",
+                    })
+
+                }catch(e) {
+                    console.log("Umami tracking error: ", e);
+                }
                 await prisma.cart.delete({
                     where:{
                         id: cartId,

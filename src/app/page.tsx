@@ -1,15 +1,18 @@
-import { getCurrentSession } from "@/action/auths";
 import { getAllProducts } from "@/sanity/lib/client";
 import SalesCampaingBanner from "@/components/layout/SalesCampaingBanner";
 import ProductGrid from "@/components/product/ProductGrid";
+import WheelOfFortune from "@/components/layout/WheelOfFortune";
+import {getWheelOfFortureConfiguration} from "@/action/wheel-of-forture-action";
 
 export default async function Home() {
     const products = await getAllProducts();
     // console.log(products);
+    const {randomProducts , winningIndex} = await getWheelOfFortureConfiguration();
 
     return (
         <div>
             <SalesCampaingBanner/>
+            <WheelOfFortune products={randomProducts} winningIndex={winningIndex} />
             <section className="container mx-auto px-8">
                 <ProductGrid products={products} />
             </section>

@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-import React from "react";
+import React, {Suspense} from "react";
 import {getCurrentSession} from "@/action/auths";
 import {SanityLive} from "@/sanity/lib/live";
 import HeaderCategorySelector from "@/components/layout/HeaderCategorySelector";
 import Cart from "@/components/cart/Cart";
+import Script from "next/script";
+import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -38,7 +40,15 @@ export default async function RootLayout({
         className={`${inter.className} antialiased bg-white min-h-[125vh]`}
       >
       <Header user={user} categorySelector={<HeaderCategorySelector/>}></Header>
-        {children}
+      <Script
+        src={"https://cloud.umami.is/script.js"}
+        data-website-id={'e09676c2-1da3-4e16-9a9c-a94b7640dc4e'}
+        strategy={'beforeInteractive'}
+      />
+      <Suspense>
+          <AnalyticsTracker user={user}/>
+      </Suspense>
+      {children}
       <Cart/>
       <SanityLive/>
       </body>

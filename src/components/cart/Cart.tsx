@@ -1,6 +1,6 @@
 "use client"
 import React, {useEffect, useMemo, useState} from 'react';
-import {useCartStore} from "@/stores/cart-store";
+import {useCartStore , type CartItem as CartItemType} from "@/stores/cart-store";
 import {useShallow} from "zustand/shallow";
 import {Loader2, ShoppingCart, X} from "lucide-react";
 import Link from "next/link";
@@ -9,8 +9,73 @@ import {formatPrice} from "@/lib/utils";
 import {createCheckoutSession} from "@/action/stripe-actions";
 
 const freeShippingAmount = 15;
+
+const CartItem = ({item}: {item: CartItemType}) => {
+    const {removeItem,updateQuantity} = useCartStore(
+        useShallow((state)=>({
+            updateQuantity:state.updateQuantity,
+            removeItem: state.removeItem,
+        }))
+    )
+    const isFreeItem = item.price === 0;
+    return (
+            <div key={`cart-item-${item.id}`} className={"flex gap-4 p-4 hover:bg-gray-50 "}>
+                    <div className={"relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border"}>
+                        <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className={"object-cover"}
+                        />
+                    </div>
+                    <div className={"flex-1 min-w-0"}>
+                        <h3 className={"font-medium text-gray-900 truncate"}>
+                            {item.title}
+                        </h3>
+                        <div className={"text-sm text-gray-500 mt-1"}>
+                            {isFreeItem?(
+                                <span className={"text-emerald-600 font-medium"}>FREE</span>
+                            ):(
+                                formatPrice(item.price)
+                            )}
+                        </div>
+                        <div className={"flex items-center gap-3 mt-2"}>
+                            {isFreeItem?(
+                                <div className={"text-sm text-emerald-600 font-medium"}>
+                                    Prize Item
+                                </div>
+                            ):(
+                                <>
+                                    <select
+                                        value={item.quantity}
+                                        onChange={(e) => updateQuantity(item.id,Number(e.target.value))}
+                                        className={"border rounded-md px-2 py-1 text-sm bg-white"}
+                                    >
+                                        {[...Array(Math.max(10, item.quantity))].map((_, i) => {
+                                            const num = i + 1;
+                                            return (
+                                                <option key={`cart-qty-${item.id}-${num}`} value={num}>
+                                                    {num}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    <button
+                                        onClick={()=>removeItem(item.id)}
+                                        className={"text-red-500 text-sm hover:text-red-600"}
+                                    >
+                                        Remove
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+            </div>
+    )
+}
+
 const Cart = () => {
-    const {cartId,removeItem,items,close,isOpen,syncWithUser,setLoaded,getTotalItems,getTotalPrice,updateQuantity} = useCartStore(
+    const {cartId,items,close,isOpen,syncWithUser,setLoaded,getTotalItems,getTotalPrice} = useCartStore(
         useShallow((state)=>({
             cartId:state.cartId,
             items:state.items,
@@ -19,8 +84,6 @@ const Cart = () => {
             syncWithUser: state.syncWithUser,
             setLoaded: state.setLoaded,
             getTotalItems: state.getTotalItems,
-            updateQuantity:state.updateQuantity,
-            removeItem: state.removeItem,
             getTotalPrice: state.getTotalPrice,
         }))
     )
@@ -39,6 +102,19 @@ const Cart = () => {
         }
         setLoadingProceed(true);
         const checkoutUrl = await createCheckoutSession(cartId);
+        try {
+            const anyWindow = window as any;
+
+            if (anyWindow.umami) {
+                anyWindow.umami.track('proceed_to_checkout', {
+                    cartId: cartId,
+                    total: getTotalPrice(),
+                    currency: "USD"
+                })
+            }
+        }catch (e){
+            console.log(e)
+        }
         window.location.href = checkoutUrl;
         setLoadingProceed(false)
     }
@@ -103,46 +179,7 @@ const Cart = () => {
                         ):(
                             <div className={"divide-y"}>
                                 {items.map((item) => (
-                                    <div key={`cart-item-${item.id}`} className={"flex gap-4 p-4 hover:bg-gray-50 "}>
-                                        <div className={"relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border"}>
-                                            <Image
-                                                src={item.image}
-                                                alt={item.title}
-                                                fill
-                                                className={"object-cover"}
-                                            />
-                                        </div>
-                                        <div className={"flex-1 min-w-0"}>
-                                            <h3 className={"font-medium text-gray-900 truncate"}>
-                                                {item.title}
-                                            </h3>
-                                            <div className={"text-sm text-gray-500 mt-1"}>
-                                                {formatPrice(item.price)}
-                                            </div>
-                                            <div className={"flex items-center gap-3 mt-2"}>
-                                                <select
-                                                    value={item.quantity}
-                                                    onChange={(e) => updateQuantity(item.id,Number(e.target.value))}
-                                                    className={"border rounded-md px-2 py-1 text-sm bg-white"}
-                                                >
-                                                    {[...Array(Math.max(10, item.quantity))].map((_, i) => {
-                                                        const num = i + 1;
-                                                        return (
-                                                            <option key={`cart-qty-${item.id}-${num}`} value={num}>
-                                                                {num}
-                                                            </option>
-                                                        );
-                                                    })}
-                                                </select>
-                                                <button
-                                                    onClick={()=>removeItem(item.id)}
-                                                    className={"text-red-500 text-sm hover:text-red-600"}
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <CartItem key={"cart-item-"+item.id} item={item} />
                                 ))}
                             </div>
                         )}
