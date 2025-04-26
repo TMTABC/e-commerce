@@ -239,8 +239,11 @@ const PriceTag = ({price}: { price: number }) => {
 type WheelOfFortuneProps = {
     products: Product[];
     winningIndex: number;
-}
-const WheelOfFortune = ({ products, winningIndex }: WheelOfFortuneProps) => {
+    forceOpen?: boolean;
+    onClose?: () => void;
+};
+
+const WheelOfFortune = ({ products, winningIndex,forceOpen,onClose }: WheelOfFortuneProps) => {
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -250,20 +253,26 @@ const WheelOfFortune = ({ products, winningIndex }: WheelOfFortuneProps) => {
 
     const [wheelStyle, setWheelStyle] = useState<React.CSSProperties>({});
 
+
     useEffect(() => {
         const hasPlayed = localStorage.getItem("has-played-wheel-of-fortune");
-        if(!hasPlayed) {
-            const timer = setTimeout(() => {
-                setIsOpen(true);
-            }, 2000);
+
+        if (forceOpen) {
+            setIsOpen(true);
+            return;
+        }
+
+        if (!hasPlayed) {
+            const timer = setTimeout(() => setIsOpen(true), 2000);
             return () => clearTimeout(timer);
         }
-    });
+    }, [forceOpen]);
 
     const handleSpin = () => {
         if(isSpinning || hasSpun) {
             return;
         }
+        localStorage.setItem("has-played-wheel-of-fortune", 'true');
 
         setIsSpinning(true);
         setHasSpun(true);
@@ -295,8 +304,12 @@ const WheelOfFortune = ({ products, winningIndex }: WheelOfFortuneProps) => {
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className='sm:max-w-[800px] p-0'>
+        <Dialog open={isOpen} onOpenChange={(open) => {
+            setIsOpen(open);
+            if (!open && onClose) onClose();
+        }}>
+
+        <DialogContent className='sm:max-w-[800px] p-0'>
                 <DialogTitle>
                     <div className='p-6 text-center relative overflow-hidden'>
                         <div className='absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 animate-pulse' />

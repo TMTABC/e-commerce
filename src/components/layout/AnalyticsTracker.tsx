@@ -43,7 +43,7 @@ const AnalyticsTracker = ({user}:AnalyticsTrackerProps) => {
     }, [user]);
     return (
         <div>
-
+            <></>
         </div>
     );
 };
